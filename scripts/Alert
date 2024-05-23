@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "Watching Following Command: $@"
+if $@ ; then
+	echo -e "\a" & zenity --info --text="$1 Command terminated successfully"
+else
+	echo -e "\a" & zenity --info --text="$1 Command execution failed"
+fi

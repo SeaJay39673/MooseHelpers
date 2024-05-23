@@ -1,0 +1,9 @@
+#!/bin/bash
+
+loc=$(dirname $(readlink -f "$0"))
+brc=$(find ~/ -type f -name .bashrc)
+
+sudo cp "$loc/Alert" "/bin/"
+sudo cp "$loc/Run" "/bin/"
+
+sudo echo -e "ALERT=\"/bin/Alert\"\nRUN=\"/bin/Run\"\nPATH=\"\$ALERT:\$RUN:\$PATH\"\nexport PATH" >> "$brc"

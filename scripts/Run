@@ -1,0 +1,34 @@
+#!/bin/bash
+while getopts ':wp:n:' OPTION; do
+	case "$OPTION" in
+		w)
+			watch="Alert"
+		;;
+		p)
+			path="$OPTARG"
+		;;
+		n)
+			paralell="mpiexec -n $OPTARG"
+		;;
+		?)
+			echo "script usage: $(basename $0) [-w] [-p] [-n cores]"
+			exit 1
+		;;
+	esac
+done
+
+shift "$(($OPTIND -1))"
+
+if [ -z "$1" ]; then
+	echo "input file not provided"
+	exit 1
+fi
+
+if [[ $1 != *.i ]]; then
+	echo "incorrect file type"
+	exit 1
+fi
+
+if [ -z "${path+x}" ]; then path=$(find ../ -type f -name '*-opt'); fi
+
+eval "$watch $paralell $path -i $1"
