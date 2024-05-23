@@ -1,7 +1,15 @@
 #!/bin/bash
 echo "Watching Following Command: $@"
+
+window="--width=600 --height=450"
+
 if $@ ; then
-	echo -e "\a" & zenity --info --text="$1 Command terminated successfully"
+	type="--info"
+	output="--text=\"$1 Command terminated successfully\""
 else
-	echo -e "\a" & zenity --info --text="$1 Command execution failed"
+	type="--error"
+	output="--text=\"$1 Command execution failed\""
 fi
+
+echo -e "\a"
+eval "zenity $type $window $output"
