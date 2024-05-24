@@ -9,9 +9,11 @@ This repo is intended for personal use.
 ```Bash
 ./<path-to-repository>/scripts/SetupScripts
 ```
-    This function will copy the script files into your /bin/ directory and add the /bin/ paths to the $PATH environment variable in your ~/.bashrc file.
+    This function will copy the script files into your /bin/ directory
+    and add the /bin/ paths to the $PATH environment variable in your ~/.bashrc file.
 ## Note:
-    Rerunning SetupScripts will recopy the files to /bin/, but will not update the $PATH variable in ~./bashrc if done once before.
+    Rerunning SetupScripts will recopy the files to /bin/,
+    but will not update the $PATH variable in ~./bashrc if done once before.
 
 # Helpers:
 
@@ -21,7 +23,8 @@ This repo is intended for personal use.
 
 ## Alert:
     The Alert helper will notify the user when a command has finished. 
-    This occurs through both a sound and (optionally) a popup. The popup will tell the user whether the command failed or was successful.
+    This occurs through both a sound and (optionally) a popup.
+    The popup will tell the user whether the command failed or was successful.
 ### Examples
 ```Bash
 #Ex 1:
