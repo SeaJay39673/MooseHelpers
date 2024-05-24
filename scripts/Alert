@@ -1,8 +1,16 @@
 #!/bin/bash
-echo "Watching Following Command: $@"
-
+win=0
 window="--width=600 --height=450"
+while getopts ':w' OPTION; do
+	case "$OPTION" in
+		w)
+			win=1
+		;;
+	esac
+done
+shift "$(($OPTIND -1))"
 
+echo "Watching Following Command: $@"
 if $@ ; then
 	type="--info"
 	output="--text=\"$1 Command terminated successfully\""
@@ -12,4 +20,6 @@ else
 fi
 
 echo -e "\a"
-eval "zenity $type $window $output"
+if [ "$win" -eq "1" ]; then
+	eval "zenity $type $window $output"
+fi

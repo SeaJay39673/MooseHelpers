@@ -1,8 +1,11 @@
 #!/bin/bash
-while getopts ':wp:n:' OPTION; do
+while getopts ':awp:n:t:i:' OPTION; do
 	case "$OPTION" in
-		w)
+		a)
 			watch="Alert"
+		;;
+		w)
+			win="-w"
 		;;
 		p)
 			path="$OPTARG"
@@ -10,25 +13,31 @@ while getopts ':wp:n:' OPTION; do
 		n)
 			paralell="mpiexec -n $OPTARG"
 		;;
+		t)
+			threads="--n-threads=$OPTARG"
+		;;
+		i)
+			file="$OPTARG"
+		;;
 		?)
-			echo "script usage: $(basename $0) [-w] [-p] [-n cores]"
+			echo "script usage: $(basename $0) [-a (Alert)] [-w (Alert with window)] [-p <path-to-opt>] [-n cores] [-t threads] [-i <path-to-input-file>]"
 			exit 1
 		;;
 	esac
 done
 
-shift "$(($OPTIND -1))"
+#shift "$(($OPTIND -1))" #Not needed
 
-if [ -z "$1" ]; then
+if [ -z "$file" ]; then
 	echo "input file not provided"
 	exit 1
 fi
 
-if [[ $1 != *.i ]]; then
+if [[ $file != *.i ]]; then
 	echo "incorrect file type"
 	exit 1
 fi
 
 if [ -z "${path+x}" ]; then path=$(find ../ -type f -name '*-opt'); fi
 
-eval "$watch $paralell $path -i $1"
+eval "$watch $win $paralell ./$path -i $file $threads"

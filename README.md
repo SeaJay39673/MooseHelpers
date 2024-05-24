@@ -12,7 +12,7 @@ This repo is intended for personal use.
 
 ## Alert:
     The Alert helper will notify the user when a command has finished. 
-    This occurs through both a sound and popup. The popup will tell the user whether the command failed or was successful.
+    This occurs through both a sound and (optionally) a popup. The popup will tell the user whether the command failed or was successful.
 ### Examples
 ```Bash
 #Ex 1:
@@ -20,27 +20,35 @@ Alert echo test
 
 #Ex 2:
 Alert make -j 6
+
+#Ex 3 (with window):
+Alert -w make -j 6
 ```
 
 ## Run:
     The Run helper increases ease of use for running moose applications.
     The Run helper takes in the following inputs:
     Optional:
-        -w (Watch command, will use the Alert helper)
-        -n (number of threads, will use mpiexec with the number specified)
+        -a (Alert command, will use the Alert helper)
+        -w (Window flag, toggles Alert window on)
+        -n (number of cores, will use mpiexec with the number specified)
+        -t (number of threads, used in the opt file directly)
         -p (path, manually specify where the application opt file is)
     Required:
-        <path-to-input-file>
-*Note: if the current directory is one lower than the <path-to-opt> file, specifying path is not required*
+        -i <path-to-input-file>
+*Note: if the current directory is one lower than the \<path-to-opt\> file, specifying path is not required*
 
 ### Examples:
 ```Bash
 #Ex 1:
-Run input.i
+Run -i input.i
 
 #Ex 2 (Alert and run in parallel):
-Run -w -n 6 input.i
+Run -a -n 6 -i input.i
 
-#Ex 3 (Alert, run in parallel, and specify path):
-Run -w -n 6 -p ../project-opt input.i
+#Ex 3 (Alert window, run in parallel, and specify path):
+Run -a -w -n 6 -p ../project-opt -i input.i
+
+#Ex 4 (run in parallel with threads)
+Run -n 6 -t 2 -i input.i
 ```
