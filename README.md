@@ -4,6 +4,15 @@ This repository is for managing helper functions for MOOSE.
 
 This repo is intended for personal use.
 
+# Setup:
+    To setup and make the helpers available to you, clone this repository and run:
+```Bash
+./<path-to-repository>/scripts/SetupScripts
+```
+    This function will copy the script files into your /bin/ directory and add the /bin/ paths to the $PATH environment variable in your ~/.bashrc file.
+## Note:
+    Rerunning SetupScripts will recopy the files to /bin/, but will not update the $PATH variable in ~./bashrc if done once before.
+
 # Helpers:
 
 ## SetupScripts
