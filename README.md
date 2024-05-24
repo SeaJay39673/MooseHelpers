@@ -18,7 +18,8 @@ This repo is intended for personal use.
 # Helpers:
 
 ## SetupScripts
-    This script will copy the following script files to the users /bin/ directory. The ~/.bashrc will be modified to update the $PATH variable to include the path to the scripts newly copied into /bin/.
+    This script will copy the following script files to the users /bin/ directory.
+    The ~/.bashrc will be modified to update the $PATH variable to include the path to the scripts newly copied into /bin/.
     This allows the user to simply reference the name of the script, and not have to specify the path to the script.
 
 ## Alert:
