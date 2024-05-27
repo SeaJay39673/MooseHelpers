@@ -1,0 +1,40 @@
+#!/bin/bash
+
+loc=$(dirname $(readlink -f "$0")) # Current location
+brc=$(find ~/ -type f -name .bashrc) # Location of .bashrc file
+
+
+# Run all of the setup scripts
+setup=$loc/setup/*
+for f in $setup
+do
+eval "$f"
+localDir="/scripts/$(basename -a $f)"
+if ! grep -q "$localDir" $loc/.gitignore; then
+	sudo echo "$localDir" >> $loc/.gitignore
+fi
+done
+
+
+# Add all scripts to /bin/
+scripts=$loc/scripts/*
+filenames=()
+for f in $scripts
+do
+sudo cp "$f" "/bin/"
+filenames+=("$(basename -a $f)")
+done
+
+
+# If paths not defined, udpate them
+if ! grep -q 'MooseHelpers' "$brc"; then
+	sudo echo -e "\n\n#MooseHelpers" >> "$brc"
+	pathstring="PATH=\""
+	for f in ${filenames[@]}
+	do
+		sudo echo "$f=\"/bin/$f\"" >> "$brc"
+		pathstring+="\$$f:"
+	done
+	pathstring+="\$PATH\""
+	sudo echo -e "$pathstring\nexport PATH" >> "$brc"
+fi

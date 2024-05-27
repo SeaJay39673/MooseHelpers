@@ -7,20 +7,30 @@ This repo is intended for personal use.
 # Setup:
     To setup and make the helpers available to you, clone this repository and run:
 ```Bash
-./<path-to-repository>/scripts/SetupScripts
+./<path-to-repository>/SetupScripts
 ```
-    This function will copy the script files into your /bin/ directory
-    and add the /bin/ paths to the $PATH environment variable in your ~/.bashrc file.
+    This script will run the scripts in the setup directory first. 
+    The setup scripts create new scripts within the scripts directory.
+    Then, this script will copy the script files into your /bin/ directory.
+    Finally, the paths to the newly copied files are updated in the environment variables.
 ## Note:
-    Rerunning SetupScripts will recopy the files to /bin/,
-    but will not update the $PATH variable in ~./bashrc if done once before.
+    Rerunning SetupScripts will rebuild and recopy the files to /bin/,
+    but will not update the $PATH environment variables if done once before.
 
 # Helpers:
 
 ## SetupScripts
     This script will copy the following script files to the users /bin/ directory.
-    The ~/.bashrc will be modified to update the $PATH variable to include the path to the scripts newly copied into /bin/.
+    The ~/.bashrc file will be modified to update the $PATH variable to include these files from the /bin/ directory.
     This allows the user to simply reference the name of the script, and not have to specify the path to the script.
+
+## peacock:
+    This is a wrapper script to make use of peacock from the moose directory. Use this wrapper to open output files.
+### Examples:
+```Bash
+#Ex 1:
+peacock <path-to-out-file>
+```
 
 ## Alert:
     The Alert helper will notify the user when a command has finished. 
