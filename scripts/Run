@@ -1,5 +1,6 @@
 #!/bin/bash
-while getopts ':awp:n:t:i:' OPTION; do
+peacock=0
+while getopts ':awp:n:t:i:v' OPTION; do
 	case "$OPTION" in
 		a)
 			watch="Alert"
@@ -18,6 +19,9 @@ while getopts ':awp:n:t:i:' OPTION; do
 		;;
 		i)
 			file="$OPTARG"
+		;;
+		v)
+			peacock=1
 		;;
 		?)
 			echo "script usage: $(basename $0) [-a (Alert)] [-w (Alert with window)] [-p <path-to-opt>] [-n cores] [-t threads] [-i <path-to-input-file>]"
@@ -40,4 +44,8 @@ fi
 
 if [ -z "${path+x}" ]; then path=$(find ../ -type f -name '*-opt'); fi
 
-eval "$watch $win $paralell ./$path -i $file $threads"
+if [ "$peacock" -eq "1" ]; then
+	peacock="peacock \"${file//.i/_out.e}\""
+fi
+
+eval "$watch $win $paralell ./$path -i $file $threads && $peacock"

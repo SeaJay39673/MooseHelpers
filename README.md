@@ -57,6 +57,7 @@ Alert -w make -j 6
         -n (number of cores, will use mpiexec with the number specified)
         -t (number of threads, used in the opt file directly)
         -p (path, manually specify where the application opt file is)
+        -v (View result in peacock)
     Required:
         -i <path-to-input-file>
 *Note: if the current directory is one lower than the \<path-to-opt\> file, specifying path is not required*
@@ -74,4 +75,7 @@ Run -a -w -n 6 -p ../project-opt -i input.i
 
 #Ex 4 (run in parallel with threads)
 Run -n 6 -t 2 -i input.i
+
+#Ex 5 (Run and view in peacock)
+Run -v input.i
 ```
