@@ -77,5 +77,5 @@ Run -a -w -n 6 -p ../project-opt -i input.i
 Run -n 6 -t 2 -i input.i
 
 #Ex 5 (Run and view in peacock)
-Run -v input.i
+Run -v -i input.i
 ```
