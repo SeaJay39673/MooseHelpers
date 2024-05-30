@@ -13,6 +13,7 @@ fi
 scripts=$loc/scripts/*
 for f in $scripts
 do
+# if file is real, delete
 if [ -f "/bin/$(basename -a $f)" ]; then
     sudo rm "/bin/$(basename -a $f)"
     echo "Deleted: /bin/$(basename -a $f)"

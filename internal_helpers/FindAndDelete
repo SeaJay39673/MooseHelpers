@@ -1,8 +1,9 @@
 #!/bin/bash
 
+# find the line numbers the match string $1 from file $2
 lines=$(sed -n "/$1/=" "$2")
 
-# find start and end of $1 occurence in $2 file
+# find start and end of occurence $1 in file $2
 i=0
 for f in ${lines[@]};
 do
@@ -20,8 +21,9 @@ if [ -z "${start+x}" -o -z "${end+x}" ]; then
     exit 1
 fi
 
+# if removing lines is successful
 if sudo sed -i.back -e "$start,${end}d" "$2" ; then 
     echo -e "Lines $start - $end removed from $2.\nYou can find the unmodified file at $2.back"
-else
+else # if not successful
     echo "Could not remove lines $start - $end from $2"
 fi

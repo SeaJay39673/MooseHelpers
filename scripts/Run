@@ -30,22 +30,25 @@ while getopts ':awp:n:t:i:v' OPTION; do
 	esac
 done
 
-#shift "$(($OPTIND -1))" #Not needed
-
+# If file is not defined
 if [ -z "$file" ]; then
 	echo "input file not provided"
 	exit 1
 fi
 
+# If file is not of type '.i' extension
 if [[ $file != *.i ]]; then
 	echo "incorrect file type"
 	exit 1
 fi
 
+# If path not specified, try to find opt file automatically
 if [ -z "${path+x}" ]; then path=$(find ../ -type f -name '*-opt'); fi
 
+# Determine if peacock will be used to view output after execution
 if [ "$peacock" -eq "1" ]; then
 	peacock="peacock \"${file//.i/_out.e}\""
 fi
 
+# Run
 eval "$watch $win $paralell ./$path -i $file $threads && $peacock"

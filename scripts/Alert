@@ -11,15 +11,21 @@ done
 shift "$(($OPTIND -1))"
 
 echo "Watching Following Command: $@"
+# Try running the command
 if $@ ; then
+	# Success
 	type="--info"
 	output="--text=\"$1 Command terminated successfully\""
 else
+	# Failure
 	type="--error"
 	output="--text=\"$1 Command execution failed\""
 fi
 
+# Alert user with sound
 echo -e "\a"
+
+# If window specified, Alert user with popup window
 if [ "$win" -eq "1" ]; then
 	eval "zenity $type $window $output"
 fi
