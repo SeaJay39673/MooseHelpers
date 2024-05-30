@@ -17,6 +17,13 @@ This repo is intended for personal use.
     Rerunning SetupScripts will rebuild and recopy the files to /bin/,
     but will not update the $PATH environment variables if done once before.
 
+# Uninstall:
+    To uninstall the scripts, simply run:
+```Bash
+./<path-to-repository>/UninstallScripts
+```
+    This will remove the paths appended to ~/.bashrc and the script files from the /bin/ directory.
+    
 # Helpers:
 
 ## SetupScripts

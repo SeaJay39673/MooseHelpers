@@ -1,0 +1,27 @@
+#!/bin/bash
+
+lines=$(sed -n "/$1/=" "$2")
+
+# find start and end of $1 occurence in $2 file
+i=0
+for f in ${lines[@]};
+do
+    if [ "$i" -eq "0" ]; then
+        start="$f"
+    else
+        end="$f"
+    fi
+    i=1
+done
+
+# If start and end could not be found
+if [ -z "${start+x}" -o -z "${end+x}" ]; then
+    &>2 echo "Could not find lines for $1 in $2"
+    exit 1
+fi
+
+if sudo sed -i.back -e "$start,${end}d" "$2" ; then 
+    echo -e "Lines $start - $end removed from $2.\nYou can find the unmodified file at $2.back"
+else
+    echo "Could not remove lines $start - $end from $2"
+fi

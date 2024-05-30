@@ -1,0 +1,20 @@
+#!/bin/bash
+
+loc=$(dirname $(readlink -f "$0")) # Current location
+brc=$(find ~/ -type f -name .bashrc) # Location of .bashrc file
+
+# Remove paths form ~/.bashrc
+echo "Removing Paths from $brc"
+if ! ./internal_helpers/FindAndDelete "#MooseHelpers" "$brc"; then
+    echo "Paths could not be removed from $brc"
+fi
+
+# Remove all scripts from /bin/
+scripts=$loc/scripts/*
+for f in $scripts
+do
+if [ -f "/bin/$(basename -a $f)" ]; then
+    sudo rm "/bin/$(basename -a $f)"
+    echo "Deleted: /bin/$(basename -a $f)"
+fi
+done

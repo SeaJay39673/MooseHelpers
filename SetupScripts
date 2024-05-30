@@ -1,4 +1,5 @@
 #!/bin/bash
+VERSION=1.0.0
 
 loc=$(dirname $(readlink -f "$0")) # Current location
 brc=$(find ~/ -type f -name .bashrc) # Location of .bashrc file
@@ -25,10 +26,8 @@ sudo cp "$f" "/bin/"
 filenames+=("$(basename -a $f)")
 done
 
-
-# If paths not defined, udpate them
-if ! grep -q 'MooseHelpers' "$brc"; then
-	sudo echo -e "\n\n#MooseHelpers" >> "$brc"
+createPaths() {
+	sudo echo -e "#MooseHelpers\nMooseHelpers VERSION: $VERSION" >> "$brc"
 	pathstring="PATH=\""
 	for f in ${filenames[@]}
 	do
@@ -36,5 +35,19 @@ if ! grep -q 'MooseHelpers' "$brc"; then
 		pathstring+="\$$f:"
 	done
 	pathstring+="\$PATH\""
-	sudo echo -e "$pathstring\nexport PATH" >> "$brc"
+	sudo echo -e "$pathstring\nexport PATH\n#MooseHelpers" >> "$brc"
+}
+
+# If paths not defined, udpate them
+if ! grep -qF '#MooseHelpers' "$brc"; then
+	createPaths
+else
+	if [[ $(grep -F "MooseHelpers VERSION:" "$brc") != *"$VERSION" ]]; then
+		echo "Version mismatch, updating old paths in $brc"
+		if ./internal_helpers/FindAndDelete "#MooseHelpers" "$brc" ; then
+			createPaths
+		else
+			echo "Could not remove old paths in $brc"
+		fi
+	fi
 fi
