@@ -7,7 +7,7 @@ brc=$(find ~/ -type f -name .bashrc) # Location of .bashrc file
 
 # Remove paths form ~/.bashrc
 echo "Removing Paths from $brc"
-if ! ./internal_helpers/FindAndDelete "#MooseHelpers" "$brc"; then
+if ! sudo "$loc/internal_helpers/FindAndDelete" "#MooseHelpers" "$brc"; then
     echo "Paths could not be removed from $brc"
 fi
 

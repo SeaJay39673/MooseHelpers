@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=1.1.2 
+VERSION=1.1.3 
 
 echo "Installing"
 
@@ -54,7 +54,7 @@ else # If paths defined, but version not up to date, then rewrite paths
 	if [[ $(grep -F "MooseHelpers VERSION:" "$brc") != *"$VERSION" ]]; then
 		echo "Version mismatch, updating old paths in $brc"
 		# Try deleting old paths
-		if ./internal_helpers/FindAndDelete "#MooseHelpers" "$brc" ; then
+		if "$loc/internal_helpers/FindAndDelete" "#MooseHelpers" "$brc" ; then
 			createPaths
 		else
 			echo "Could not remove old paths in $brc"
