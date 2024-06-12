@@ -43,6 +43,7 @@ peacock <path-to-out-file>
     The Alert helper will notify the user when a command has finished. 
     This occurs through both a sound and (optionally) a popup.
     The popup will tell the user whether the command failed or was successful.
+    You can also specify to only display a popup on failure with the "-x" flag.
 ### Examples
 ```Bash
 #Ex 1:
@@ -53,6 +54,9 @@ Alert make -j 6
 
 #Ex 3 (with window):
 Alert -w make -j 6
+
+#Ex 4 (Display only on failure):
+Alert -w -x echow Test
 ```
 
 ## Run:
@@ -60,7 +64,7 @@ Alert -w make -j 6
     The Run helper takes in the following inputs:
     Optional:
         -a (Alert command, will use the Alert helper)
-        -w (Window flag, toggles Alert window on)
+        -w (Window flag, toggles Alert window on, will use -a implicitly if not specified)
         -n (number of cores, will use mpiexec with the number specified)
         -t (number of threads, used in the opt file directly)
         -p (path, manually specify where the application opt file is)
@@ -78,7 +82,7 @@ Run -i input.i
 Run -a -n 6 -i input.i
 
 #Ex 3 (Alert window, run in parallel, and specify path):
-Run -a -w -n 6 -p ../project-opt -i input.i
+Run -w -n 6 -p ../project-opt -i input.i
 
 #Ex 4 (run in parallel with threads)
 Run -n 6 -t 2 -i input.i

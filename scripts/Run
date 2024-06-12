@@ -7,6 +7,7 @@ while getopts ':awp:n:t:i:v' OPTION; do
 		;;
 		w)
 			win="-w"
+			watch="Alert"
 		;;
 		p)
 			path="$OPTARG"
@@ -47,8 +48,11 @@ if [ -z "${path+x}" ]; then path=$(find ../ -type f -name '*-opt'); fi
 
 # Determine if peacock will be used to view output after execution
 if [ "$peacock" -eq "1" ]; then
+	failonly="-x"
 	peacock="peacock \"${file//.i/_out.e}\""
 fi
 
 # Run
-eval "$watch $win $paralell ./$path -i $file $threads && $peacock"
+if eval "$watch $win $failonly $paralell ./$path -i $file $threads" ; then
+	eval "$peacock"
+fi

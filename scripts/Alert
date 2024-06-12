@@ -1,10 +1,14 @@
 #!/bin/bash
 win=0
+failonly=0
 window="--width=600 --height=450"
-while getopts ':w' OPTION; do
+while getopts ':wx' OPTION; do
 	case "$OPTION" in
 		w)
 			win=1
+		;;
+		x)
+			failonly=1
 		;;
 	esac
 done
@@ -16,10 +20,12 @@ if $@ ; then
 	# Success
 	type="--info"
 	output="--text=\"$1 Command terminated successfully\""
+	success=0
 else
 	# Failure
 	type="--error"
 	output="--text=\"$1 Command execution failed\""
+	success=1
 fi
 
 # Alert user with sound
@@ -27,5 +33,13 @@ echo -e "\a"
 
 # If window specified, Alert user with popup window
 if [ "$win" -eq "1" ]; then
-	eval "zenity $type $window $output"
+	if [[ "$failonly" -eq "1" && "$success" -eq "1" ]]; then
+		eval "zenity $type $window $output"
+	else
+		if [ "$failonly" -eq "0" ]; then
+			eval "zenity $type $window $output"
+		fi
+	fi	
 fi
+
+exit "$success"
