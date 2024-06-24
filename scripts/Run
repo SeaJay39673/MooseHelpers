@@ -48,7 +48,9 @@ if [ -z "${path+x}" ]; then path=$(find ../ -type f -name '*-opt'); fi
 
 # Determine if peacock will be used to view output after execution
 if [ "$peacock" -eq "1" ]; then
-	failonly="-x"
+	if [ "$win" -eq "-w" ]; then
+		failonly="-x"
+	fi
 	peacock="peacock \"${file//.i/_out.e}\""
 fi
 
