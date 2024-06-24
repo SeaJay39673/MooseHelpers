@@ -25,7 +25,7 @@ while getopts ':awp:n:t:i:v' OPTION; do
 			peacock=1
 		;;
 		?)
-			echo "script usage: $(basename $0) [-a (Alert)] [-w (Alert with window)] [-p <path-to-opt>] [-n cores] [-t threads] [-i <path-to-input-file>]"
+			echo "script usage: $(basename $0) [-a (Alert)] [-w (Alert with window)] [-v (View results in Peacock)] [-p <path-to-opt>] [-n cores] [-t threads] [-i <path-to-input-file>]"
 			exit 1
 		;;
 	esac
