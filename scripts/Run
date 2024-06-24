@@ -55,6 +55,6 @@ if [ "$peacock" -eq "1" ]; then
 fi
 
 # Run
-if eval "caffeinate $watch $win $failonly $paralell ./$path -i $file $threads" ; then
+if eval "caffeinate & $watch $win $failonly $paralell ./$path -i $file $threads" ; then
 	eval "$peacock"
 fi
