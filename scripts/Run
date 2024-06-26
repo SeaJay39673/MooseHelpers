@@ -1,35 +1,87 @@
 #!/bin/bash
-peacock=0
-while getopts ':awp:n:t:i:v' OPTION; do
+peacock=""
+caff=0
+
+args=()
+
+# Caffeinate handling in for loop
+for arg in $@
+do
+	args+=("$arg") # append each string into a variable in an array
+	if [ "$arg" == "-c" ]; then # if caffeinate is being used, set to 1 in advance. Allows for conditonal logic in getopts
+		caff=1
+	fi
+done
+set -- "${args[@]}" # Sets current arguments of possibly a single string back into an array of individual string elements. Allows support for caffeinate argument handling
+
+# Handle arguments passed from function call
+while getopts ':cawp:n:t:i:v' OPTION; do
 	case "$OPTION" in
+		c)
+			echo "Running command with caffeinate."
+		;;
 		a)
-			watch="Alert"
+			if [ "$caff" -eq "1" ]; then
+				watch="-a"
+			else
+				watch="Alert"
+			fi
 		;;
 		w)
-			win="-w"
-			watch="Alert"
+			if [ "$caff" -eq "1" ]; then
+				win="-w"
+			else
+				win="-w"
+				watch="Alert"
+			fi
 		;;
 		p)
-			path="$OPTARG"
+			if [ "$caff" -eq "1" ]; then
+				path="-p $OPTARG"
+			else
+				path="$OPTARG"
+			fi
 		;;
 		n)
-			paralell="mpiexec -n $OPTARG"
+			if [ "$caff" -eq "1" ]; then
+				paralell="-n $OPTARG"
+			else
+				paralell="mpiexec -n $OPTARG"
+			fi
 		;;
 		t)
-			threads="--n-threads=$OPTARG"
+			if [ "$caff" -eq "1" ]; then
+				threads="-t $OPTARG"
+			else
+				threads="--n-threads=$OPTARG"
+			fi
 		;;
 		i)
-			file="$OPTARG"
+			if [ "$caff" -eq "1" ]; then
+				file="-i $OPTARG"
+			else
+				file="$OPTARG"
+			fi
 		;;
 		v)
-			peacock=1
+			if [ "$caff" -eq "1" ]; then
+				peacock="-v"
+			else
+				peacock=1
+			fi
 		;;
 		?)
-			echo "script usage: $(basename $0) [-a (Alert)] [-w (Alert with window)] [-v (View results in Peacock)] [-p <path-to-opt>] [-n cores] [-t threads] [-i <path-to-input-file>]"
+			echo "script usage: $(basename $0) [-c (Caffeinate)] [-a (Alert)] [-w (Alert with window)] [-v (View results in Peacock)] [-p <path-to-opt>] [-n cores] [-t threads] [-i <path-to-input-file>]"
 			exit 1
 		;;
 	esac
 done
+
+# call Run again with original inputs using caffeinate
+if [ "$caff" -eq "1" ]; then 
+	eval "caffeinate Run \"$watch $win $failonly $paralell $path $file $threads $peacock\""
+	exit 1
+fi
 
 # If file is not defined
 if [ -z "$file" ]; then
@@ -48,13 +100,12 @@ if [ -z "${path+x}" ]; then path=$(find ../ -type f -name '*-opt'); fi
 
 # Determine if peacock will be used to view output after execution
 if [ "$peacock" -eq "1" ]; then
-	if [ "$win" -eq "-w" ]; then
+	if [ "$win" == "-w" ]; then
 		failonly="-x"
 	fi
 	peacock="peacock \"${file//.i/_out.e}\""
 fi
 
-# Run
-if eval "caffeinate & $watch $win $failonly $paralell ./$path -i $file $threads" ; then
+if eval "$watch $win $failonly $paralell ./$path -i $file $threads" ; then
 	eval "$peacock"
 fi

@@ -1,9 +1,13 @@
 # Description:
 
-This repository is for managing helper functions for MOOSE.
+This repository is for managing helper functions for MOOSE in a Linux environment.
 
 This repo is intended for personal use.
 
+# DISCLAIMER
+    Running setup and uninstall scripts will require sudo privileges.
+    These scripts will create/remove scripts from your /bin directory and paths from your ~/bashrc file.
+    Use at your own discretion.
 # Setup:
     To setup and make the helpers available to you, clone this repository and run:
 ```Bash
@@ -63,12 +67,13 @@ Alert -w -x echow Test
     The Run helper increases ease of use for running moose applications.
     The Run helper takes in the following inputs:
     Optional:
+        -c (Caffeinate flag, use caffeinate to keep machine awake when running process)
         -a (Alert command, will use the Alert helper)
         -w (Window flag, toggles Alert window on, will use -a implicitly if not specified)
         -n (number of cores, will use mpiexec with the number specified)
         -t (number of threads, used in the opt file directly)
         -p (path, manually specify where the application opt file is)
-        -v (View result in peacock)
+        -v (View result in peacock, will not display Alert window if command ran successfully)
     Required:
         -i <path-to-input-file>
 *Note: if the current directory is one lower than the \<path-to-opt\> file, specifying path is not required*
@@ -89,4 +94,7 @@ Run -n 6 -t 2 -i input.i
 
 #Ex 5 (Run and view in peacock)
 Run -v -i input.i
+
+#Ex 6 (Run with caffeinate, Alert window, parallel with threads, and view in peacock)
+Run -c -w -v -n 6 -t 2 -i input.i
 ```
