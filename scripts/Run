@@ -1,8 +1,32 @@
 #!/bin/bash
+
+shopt -s expand_aliases
+
+brc=$(find ~/ -type f -name .bashrc) # Location of .bashrc file
+
 peacock=""
 caff=0
 
 args=()
+
+CondaInstalled()
+{
+    if command -v conda &> /dev/null
+    then
+        return 0
+    fi
+    return 1
+}
+
+MooseCreated()
+{
+    if conda env list | grep -q "^moose "; then
+        return 0
+    fi
+    return 1
+}
+
+source "$brc" 
 
 # Caffeinate handling in for loop
 for arg in $@
@@ -77,6 +101,24 @@ while getopts ':cawp:n:t:i:v' OPTION; do
 	esac
 done
 
+if ! CondaInstalled; then
+	if [ ! -d ~/miniforge ]; then
+		echo "conda not installed, please install through MooseHelpers InstallMooseScript"
+		exit 1
+	else
+		export PATH=$HOME/miniforge/bin:$PATH 
+		echo "Initializing conda. . ."
+		conda init --all
+		echo "Conda initialized."
+		source "$brc" 
+	fi
+fi
+if ! MooseCreated; then
+	echo "MOOSE environment for conda not created, please create it through MooseHelpers InstallMooseScript"
+	exit 1
+fi
+conda activate moose
+
 # call Run again with original inputs using caffeinate
 if [ "$caff" -eq "1" ]; then 
 	eval "caffeinate Run \"$watch $win $failonly $paralell $path $file $threads $peacock\""
@@ -96,14 +138,21 @@ if [[ $file != *.i ]]; then
 fi
 
 # If path not specified, try to find opt file automatically
-if [ -z "${path+x}" ]; then path=$(find ../ -type f -name '*-opt'); fi
+if [ -z "${path+x}" ]; then path=$(find ./ -type f -name '*-opt'); fi
+if [ -z "$path" ] || [! -f "$path" ]; then
+	path=$(find ../ -type f -name '*-opt')
+	if [ -z "$path" ] || [! -f "$path" ]; then
+		echo "Could not find opt file, please specifiy with -p and try again"
+		exit 1
+	fi
+fi
 
 # Determine if peacock will be used to view output after execution
 if [ "$peacock" -eq "1" ]; then
 	if [ "$win" == "-w" ]; then
 		failonly="-x"
 	fi
-	peacock="peacock \"${file//.i/_out.e}\""
+	peacock="peacock ${file//.i/_out.e}"
 fi
 
 if eval "$watch $win $failonly $paralell ./$path -i $file $threads" ; then

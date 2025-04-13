@@ -1,0 +1,236 @@
+#!/bin/bash
+
+brc=$(find ~/ -type f -name .bashrc) # Location of .bashrc file
+
+# Check if conda is already installed
+CondaInstalled()
+{
+    if command -v conda &> /dev/null
+    then
+        return 0
+    fi
+    return 1
+}
+
+# Install conda
+InstallConda()
+{
+    curl -L -O https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+    bash Miniforge3-Linux-x86_64.sh -b -p ~/miniforge
+    
+    export PATH=$HOME/miniforge/bin:$PATH
+
+    rm Miniforge3-Linux-x86_64.sh # Remove the installer when not needed
+}
+
+# Initialize conda
+InitConda()
+{
+    conda init --all
+}
+
+# Update conda
+UpdateConda()
+{
+    conda update --all --yes
+}
+
+# Check if INL channel is added to conda
+ChannelAdded()
+{
+    if conda config --show channels | grep -q "https://conda.software.inl.gov/public"; then
+        return 0
+    fi
+    return 1
+}
+
+# Add INL channel to conda
+CondaAddINLChannel()
+{
+    conda config --add channels https://conda.software.inl.gov/public
+}
+
+# Check if moose environment is created
+MooseCreated()
+{
+    if conda env list | grep -q "^moose "; then
+        return 0
+    fi
+    return 1
+}
+
+# Create moose environment
+CondaCreateMoose()
+{
+    conda create -n moose moose-dev=2025.03.24=mpich
+}
+
+# Activate moose environment
+CondaActivateMoose()
+{
+    conda activate moose
+}
+
+# Prompt user for yes/no response
+AskYesNo() {
+    while true; do
+        # Prompt user for input
+        read -p "$1 [y/n]: " response
+        
+        # Process user input
+        case "$response" in
+            [Yy]*) 
+                return 0 ;;  # Return success (yes)
+            [Nn]*) 
+                return 1 ;;  # Return failure (no)
+            *) 
+                echo "Invalid input. Please enter 'y' or 'n'." ;;  # Handle invalid input
+        esac
+    done
+}
+
+# Check if bash has "#MOOSE" in it
+BashUpdated()
+{
+    if grep -qF '#MOOSE' "$brc"; then
+        return 0
+    fi
+    return 1
+}
+
+# Check if bash activates moose conda environment when terminal opens up
+BashRunningMoose()
+{
+    if ! BashUpdated; then
+        return 1
+    fi
+    if ! grep -qF "conda activate moose" "$brc"; then
+        return 1
+    fi
+    return 0
+}
+
+# Insert the command to activate moose when terminal starts
+BashInsertRunMoose()
+{
+    sed -i "/#MOOSE/a conda active moose" "$brc"
+}
+
+# Insert the command to activate moose when terminal starts
+BashRunMoose()
+{
+    if ! BashUpdated; then
+        echo "#MOOSE" > "$brc"
+    fi
+    BashInsertRunMoose
+}
+
+# Clone the MOOSE repo from INL
+CloneMoose()
+{
+    mkdir -p ~/projects
+    cd ~/projects
+    git clone https://github.com/idaholab/moose.git
+    cd moose
+    git checkout master
+}
+
+# Test the MOOSE repo from INL
+TestMoose()
+{
+    cd ~/projects/moose/test
+    make -j 6
+    ./run_tests -j 6
+}
+
+# Add aliases to ~/.bashrc for moose
+AddAliases()
+{
+    if ! BashUpdated; then
+        echo "#MOOSE" > "$brc"
+    fi
+    if grep -qF 'alias peacock=*' "$brc" && AskYesNo "Create Alias for peacock?"; then
+        peacock=$(find ~/projects/moose/ -type f -name peacock 2>/dev/null)
+        if [ -n "$peacock" ]; then
+            echo "peacock found, creating alias. . ."
+            sed -i "/#MOOSE/a alias peacock='$peacock'" "$brc"
+            echo "alias for peacock created"
+        else
+            echo "peacock not found, can't create alias."
+        fi
+    fi
+}
+
+Start()
+{
+    source "$brc" # Update ~/.bashrc
+    if [ "$RESTARTED" == "true" ]; then
+        echo "Terminal Restarted."
+    fi
+    if ! CondaInstalled; then # if conda isn't found, check if miniforge is installed
+        if [ ! -d ~/miniforge ]; then # if miniforge not installed, install conda
+            echo "Conda not installed. Installing conda. . ."
+            InstallConda
+            echo "Conda installed."
+        else # if miniforge is installed and conda isn't found, export the path to miniforge so we can run initializer for conda
+            export PATH=$HOME/miniforge/bin:$PATH 
+        fi
+        echo "Initializing conda. . ."
+        InitConda
+        echo "Conda initialized, restarting terminal. . ."
+        source "$brc"
+        export RESTARTED=true
+        exec bash "$0" "$@"
+    else
+        echo "Conda installed."
+        if [ "$RESTARTED" == "true" ] || AskYesNo "Would you like to update conda?"; then
+            echo "Updating Conda. . ."
+            UpdateConda
+            echo "Conda Updated."
+        fi
+    fi
+    if ! ChannelAdded; then # Check if the INL channel is added to conda
+        echo "Adding INL Channel to conda. . ."
+        CondaAddINLChannel
+        echo "INL Channel added to conda."
+    else
+        echo "INL Channel already added."
+    fi
+    if ! MooseCreated; then # Check to see if the moose environment is created for conda
+        echo "Creating conda environment for moose. . ."
+        CondaCreateMoose
+        echo "conda environment created."
+    else
+        echo "Conda environment for moose already created."
+    fi
+    if ! BashRunningMoose && AskYesNo "Do you want to activate moose everytime the terminal starts?"; then # ask user if they want to run conda activate moose when terminal starts
+        echo "Updating bashrc. . ."
+        BashRunMoose
+    else
+        echo "Continuing. . ."
+    fi 
+
+    if [ ! -d ~/projects/moose ]; then # If MOOSE repo does not exist, clone it
+        echo "Cloning MOOSE repository. . ."
+        CloneMoose
+        echo "MOOSE cloned."
+    else # otherwise get latest
+        echo "MOOSE already cloned. Pulling from MOOSE. . ."
+        cd ~/projects/moose
+        git checkout master
+        git pull
+        echo "master branch updated"
+    fi
+    if AskYesNo "Would you like to run MOOSE tests?"; then # Run MOOSE tests
+        echo "Running Tests. . ."
+        CondaActivateMoose
+        TestMoose
+        echo "Tests Complete."
+    fi
+    echo "Install Complete! Creating aliases. . ."
+    AddAliases # Create Aliases
+    source "$brc"
+    echo "Restart Terminal (or run source ~/.bashrc) to update changes."
+}
+
+Start

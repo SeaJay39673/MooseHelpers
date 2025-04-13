@@ -1,29 +1,15 @@
 #!/bin/bash
-VERSION=1.3.6 
+VERSION=1.3.7 
 
 echo "Installing"
 
 echo "Installing dependencies"
 
 eval "sudo apt install caffeine"
+eval "sudo apt-get install mpich"
 
 loc=$(dirname $(readlink -f "$0")) # Current location
 brc=$(find ~/ -type f -name .bashrc) # Location of .bashrc file
-
-# Run all of the setup scripts
-echo "Creating scripts"
-setup=$loc/setup/*
-for f in $setup
-do
-name=$(basename -a $f)
-echo "Creating script: $name"
-eval "$f"
-localDir="/scripts/$name"
-if ! grep -q "$localDir" $loc/.gitignore; then
-	sudo echo "$localDir" >> $loc/.gitignore
-fi
-done
-
 
 # Add all scripts to /bin/
 echo "Adding scripts to /bin/ directory"
